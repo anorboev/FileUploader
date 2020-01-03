@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Domain.Common.ValidationAttributes
+﻿namespace Domain.Common.ValidationAttributes
 {
-    public class FileSettings
+    public class FilePolicy
     {
         public int AllowedFileSize { get; set; }
         public string AllowedFileExtensions { get; set; }

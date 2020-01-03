@@ -1,5 +1,4 @@
-﻿using Application.Helpers;
-using Application.Interfaces;
+﻿using Application.Interfaces;
 using AutoMapper;
 using Domain.Common.ValidationAttributes;
 using Domain.Entities;
@@ -10,11 +9,9 @@ using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Application.Implementation
@@ -25,7 +22,7 @@ namespace Application.Implementation
         readonly IFileUploaderDbContext _context;
         readonly IMapper _mapper;
         readonly IHostingEnvironment _hostingEnvironment;
-        readonly FileSettings _fileSetting;
+        readonly FilePolicy _fileSetting;
 
         public FileService(IConfiguration configuration, IFileUploaderDbContext context, IMapper mapper, IHostingEnvironment hostingEnvironment)
         {
@@ -34,26 +31,13 @@ namespace Application.Implementation
             _mapper = mapper;
             _hostingEnvironment = hostingEnvironment;
 
-            _fileSetting = new FileSettings();
-            _config.GetSection("FileSettings").Bind(_fileSetting);
-        }
-
-        public async Task<FileViewModel> GetById(int id)
-        {
-            var file = await _context.Files.FirstOrDefaultAsync(x => x.FileId == id);
-            return _mapper.Map<FileViewModel>(file);
+            _fileSetting = new FilePolicy();
+            _config.GetSection("FilePolicy").Bind(_fileSetting);
         }
 
         public async Task<IList<FileViewModel>> GetAll()
         {
             return await _context.Files.Select(x => _mapper.Map<FileViewModel>(x)).ToListAsync();
-        }
-
-        public async Task<IList<FileViewModel>> GetByType(string type)
-        {
-            return await _context.Files
-                .Where(x => x.Extension == type)
-                .Select(x => _mapper.Map<FileViewModel>(x)).ToListAsync();
         }
 
         public async Task Create(FileRequestModel model)
@@ -68,7 +52,7 @@ namespace Application.Implementation
 
         private async Task<UploadFile> CreateFile(FileRequestModel model)
         {
-            var extension = model.File.GetFileExtension().Trim('.');
+            var extension = Path.GetExtension(model.File.FileName).Trim('.');
             var systemName = await UploadFile(model.File, extension);
 
             if (!string.IsNullOrWhiteSpace(systemName))
@@ -77,7 +61,7 @@ namespace Application.Implementation
                 {
                     Extension = extension,
                     Name = string.IsNullOrWhiteSpace(model.Name) ? model.File.FileName : model.Name,
-                    Size = model.File.ColculateSize(),
+                    Size = model.File.Length,
                     SystemName = systemName
                 };
 
@@ -138,9 +122,9 @@ namespace Application.Implementation
             return contentType;
         }
 
-        public FileSettingsViewModel GetFileValidations()
+        public FilePolicyViewModel GetFilePolicy()
         {
-            return _mapper.Map<FileSettingsViewModel>(_fileSetting);
+            return _mapper.Map<FilePolicyViewModel>(_fileSetting);
         }
     }
 }

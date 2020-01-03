@@ -3,7 +3,6 @@ using Domain.Common;
 using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using System;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace Persistence

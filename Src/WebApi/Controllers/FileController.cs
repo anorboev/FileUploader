@@ -1,11 +1,9 @@
-﻿using System.Collections.Generic;
-using System.IO;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Application.Interfaces;
 using Domain.RequestModels;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.StaticFiles;
+using WebApi.Helpers;
 
 namespace WebApi.Controllers
 {
@@ -26,35 +24,17 @@ namespace WebApi.Controllers
             return Ok(await _fileService.GetAll());
         }
 
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetById(int id)
+
+        [HttpPost]
+        public async Task<IActionResult> Create([FromForm]FileRequestModel model)
         {
-            var file = await _fileService.GetById(id);
-
-            if (file == null)
-                return NotFound();
-
-            return Ok(file);
-        }
-
-        [HttpGet("getbytype/{type}")]
-        public async Task<IActionResult> GetByType(string type)
-        {
-            return Ok(await _fileService.GetByType(type));
-        }
-
-
-        [HttpPost("{name}")]
-        public async Task<IActionResult> Create(string name, IFormFile file, [FromForm]string username)
-        {
-            var model = new FileRequestModel()
+            if (ModelState.IsValid)
             {
-                File = file,
-                Name = name,
-                Username = username
-            };
-            await _fileService.Create(model);
-            return NoContent();
+                await _fileService.Create(model);
+                return NoContent();
+            }
+
+            return new BadRequestObjectResult(this.ModelState);
         }
 
         [HttpGet]
@@ -68,10 +48,10 @@ namespace WebApi.Controllers
             return PhysicalFile(file.FilePath, file.ContentType, file.FileName);
         }
 
-        [HttpGet("getvalidationsrules")]
-        public IActionResult GetValidations()
+        [HttpGet("getuploadpolicy")]
+        public IActionResult GetUploadPolicy()
         {
-            return Ok(_fileService.GetFileValidations());
+            return Ok(_fileService.GetFilePolicy());
         }
     }
 }

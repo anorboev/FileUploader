@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
-using System;
 using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Linq;
@@ -15,7 +14,7 @@ namespace Domain.Common.ValidationAttributes
             if (!(file == null))
             {
                 var extension = Path.GetExtension(file.FileName);
-                var serviceOptions = (IOptions<FileSettings>)validationContext.GetService(typeof(IOptions<FileSettings>));
+                var serviceOptions = (IOptions<FilePolicy>)validationContext.GetService(typeof(IOptions<FilePolicy>));
                 var service = serviceOptions.Value;
 
                 if (!service.AllowedFileExtensionsList.Any(x => extension.ToLower().EndsWith(x)))

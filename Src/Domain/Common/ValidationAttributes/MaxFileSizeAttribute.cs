@@ -1,9 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Text;
 
 namespace Domain.Common.ValidationAttributes
 {
@@ -14,7 +11,7 @@ namespace Domain.Common.ValidationAttributes
             var file = value as IFormFile;
             if (file != null)
             {
-                var serviceOptions = (IOptions<FileSettings>)validationContext.GetService(typeof(IOptions<FileSettings>));
+                var serviceOptions = (IOptions<FilePolicy>)validationContext.GetService(typeof(IOptions<FilePolicy>));
                 var service = serviceOptions.Value;
                 var allowedSizeinBytes = service.AllowedFileSize * 1024 * 1024;
 
